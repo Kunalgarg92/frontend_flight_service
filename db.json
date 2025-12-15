@@ -1,0 +1,34 @@
+{
+  "users": [
+    {
+      "id": "e42b",
+      "name": "kunal",
+      "email": "kunalgarg494@gmail.com",
+      "password": "K9254490344k@"
+    },
+    {
+      "id": "bb0c",
+      "name": "kunal",
+      "email": "kunalgarg494@gmail.com",
+      "password": "K9254490344k@"
+    },
+    {
+      "id": "d5a2",
+      "name": "kunal",
+      "email": "kunalgarg494@gmail.com",
+      "password": "K9254490344k@"
+    },
+    {
+      "id": "710a",
+      "name": "cdc",
+      "email": "kunalgarg494@gmail.com",
+      "password": "123456"
+    },
+    {
+      "id": "f8c5",
+      "name": "kunal",
+      "email": "kunal925@gmail.com",
+      "password": "123456"
+    }
+  ]
+}

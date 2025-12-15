@@ -1,0 +1,52 @@
+<div class="auth-page">
+  <div class="auth-container">
+    <h2>Create Account</h2>
+
+    <form #signupForm="ngForm" (ngSubmit)="signup(signupForm)">
+      <input
+        type="text"
+        name="name"
+        placeholder="Full Name"
+        [(ngModel)]="user.name"
+        required
+        #name="ngModel"
+      />
+      <div class="error" *ngIf="name.invalid && name.touched">Full name is required</div>
+
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        [(ngModel)]="user.email"
+        required
+        email
+        #emailCtrl="ngModel"
+        (ngModelChange)="emailExists = false"
+      />
+
+      <div class="error" *ngIf="emailCtrl.invalid && emailCtrl.touched">Enter a valid email</div>
+
+      <div class="error" *ngIf="emailExists">Email already exists. Please login.</div>
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        [(ngModel)]="user.password"
+        required
+        minlength="6"
+        #password="ngModel"
+      />
+      <div class="error" *ngIf="password.invalid && password.touched">
+        Password must be at least 6 characters
+      </div>
+
+      <button type="submit" [disabled]="signupForm.invalid">Signup</button>
+
+      <p>
+        Already have an account?
+        <a routerLink="/login">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
