@@ -1,1 +1,58 @@
-<p>dashboard works!</p>
+<h2 class="title">Search Flights</h2>
+
+<div class="search-card">
+  <form (ngSubmit)="onSearch()">
+    <div class="row">
+      <input
+        type="text"
+        placeholder="From"
+        [(ngModel)]="searchRequest.fromPlace"
+        name="fromPlace"
+        required
+      />
+      <input
+        type="text"
+        placeholder="To"
+        [(ngModel)]="searchRequest.toPlace"
+        name="toPlace"
+        required
+      />
+    </div>
+
+    <div class="row">
+      <input type="date" [(ngModel)]="searchRequest.travelDate" name="travelDate" required />
+
+      <select [(ngModel)]="searchRequest.tripType" name="tripType">
+        <option value="ONE_WAY">One Way</option>
+        <option value="ROUND_TRIP">Round Trip</option>
+      </select>
+    </div>
+
+    <div class="row" *ngIf="searchRequest.tripType === 'ROUND_TRIP'">
+      <input type="date" [(ngModel)]="searchRequest.returnDate" name="returnDate" />
+    </div>
+
+    <button type="submit">Search Flights</button>
+  </form>
+</div>
+
+<div *ngIf="loading">Searching flights...</div>
+
+<div *ngIf="!loading && flights.length === 0">No flights found</div>
+
+<div class="results" *ngIf="!loading && flights.length > 0">
+  <div class="flight-card" *ngFor="let flight of flights">
+    <h3>{{ flight.airlineName }} ({{ flight.flightNumber }})</h3>
+
+    <p>
+      Departure: {{ flight.departureTime }} <br />
+      Arrival: {{ flight.arrivalTime }}
+    </p>
+
+    <p>One Way Price: ₹{{ flight.oneWayPrice }}</p>
+
+    <p *ngIf="flight.message" class="info">
+      {{ flight.message }}
+    </p>
+  </div>
+</div>
