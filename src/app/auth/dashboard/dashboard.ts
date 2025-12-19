@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FlightSearchService } from '../../services/flight-search.service';
 import { FlightSearchRequest, FlightSearchResponse } from '../../models/flight-search.model';
 import { CommonModule } from '@angular/common';
@@ -19,29 +19,31 @@ export class DashboardComponent {
     tripType: 'ONE_WAY',
   };
 
-  flights: FlightSearchResponse[] = [];
-  loading = false;
-  errorMessage = '';
+ flights = signal<FlightSearchResponse[]>([]);
+  loading = signal(false);
+  errorMessage = signal('');
 
   constructor(private flightService: FlightSearchService) {}
 
   onSearch() {
-    this.loading = true;
-    this.errorMessage = '';
-    this.flights = [];
+   this.loading.set(true); 
+    this.flights.set([]);
 
     this.flightService.searchFlights(this.searchRequest).subscribe({
-      next: (response) => {
-        console.log('Flight search response:', response);
-
-        this.flights = response;
-        this.loading = false;
+      next: (res) => {
+        console.log('Flight search response:', res);
+        this.flights.set(res); 
+        this.loading.set(false);
       },
       error: (err) => {
-        console.error('Flight search error:', err);
-        this.errorMessage = 'No flights found or error occurred';
-        this.loading = false;
+        console.error(err);
+       this.loading.set(false);
+        this.flights.set([]);
       },
     });
+  }
+  bookFlight(flight: any) {
+    console.log('Selected flight:', flight);
+    alert(`Booking initiated for ${flight.airlineName} (${flight.flightNumber})`);
   }
 }

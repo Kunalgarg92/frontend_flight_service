@@ -1,43 +1,45 @@
-<div class="auth-page">
-  <div class="auth-container">
-    <h2>Login</h2>
+<div class="background-container">
+  <div class="content auth-page">
+    <div class="auth-container">
+      <h2>Login</h2>
 
-    <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
-      <input
-        type="text"
-        name="username"
-        placeholder="Username"
-        [(ngModel)]="username"
-        required
-        #usernameCtrl="ngModel"
-      />
+      <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          [(ngModel)]="username"
+          required
+          #usernameCtrl="ngModel"
+        />
 
-      <div class="error" *ngIf="usernameCtrl.invalid && usernameCtrl.touched">
-        Username is required
-      </div>
+        <div class="error" *ngIf="usernameCtrl.invalid && usernameCtrl.touched">
+          Username is required
+        </div>
 
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        [(ngModel)]="password"
-        required
-        minlength="6"
-        #passwordCtrl="ngModel"
-      />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          [(ngModel)]="password"
+          required
+          minlength="6"
+          #passwordCtrl="ngModel"
+        />
 
-      <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
-        Password must be at least 6 characters
-      </div>
+        <div class="error" *ngIf="passwordCtrl.invalid && passwordCtrl.touched">
+          Password must be at least 6 characters
+        </div>
 
-      <div class="error" *ngIf="loginError">Invalid email or password</div>
+        <div class="error" *ngIf="loginError">Invalid username or password</div>
 
-      <button type="submit" [disabled]="loginForm.invalid">Login</button>
+        <button type="submit" [disabled]="loginForm.invalid">Login</button>
 
-      <p>
-        Don’t have an account?
-        <a routerLink="/signup">Signup</a>
-      </p>
-    </form>
+        <p>
+          Don’t have an account?
+          <a routerLink="/signup">Signup</a>
+        </p>
+      </form>
+    </div>
   </div>
 </div>

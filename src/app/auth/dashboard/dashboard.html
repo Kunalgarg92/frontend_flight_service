@@ -1,58 +1,140 @@
-<h2 class="title">Search Flights</h2>
+<div class="main-container">
+  <h2 class="title">Search Flights</h2>
 
-<div class="search-card">
-  <form (ngSubmit)="onSearch()">
-    <div class="row">
-      <input
-        type="text"
-        placeholder="From"
-        [(ngModel)]="searchRequest.fromPlace"
-        name="fromPlace"
-        required
-      />
-      <input
-        type="text"
-        placeholder="To"
-        [(ngModel)]="searchRequest.toPlace"
-        name="toPlace"
-        required
-      />
+  <div class="search-card">
+    <form (ngSubmit)="onSearch()">
+      <!-- Trip type row -->
+      <div class="row">
+        <label
+          style="
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #e5e7eb;
+            font-size: 13px;
+          "
+        >
+          <span>Trip</span>
+          <select [(ngModel)]="searchRequest.tripType" name="tripType">
+            <option value="ONE_WAY">One way</option>
+            <option value="ROUND_TRIP">Round trip</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- From / To row -->
+      <div class="row">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+          <span
+            style="
+              font-size: 12px;
+              color: #9ca3af;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+            "
+          >
+            From
+          </span>
+          <input
+            type="text"
+            placeholder="City or airport"
+            [(ngModel)]="searchRequest.fromPlace"
+            name="fromPlace"
+            required
+          />
+        </div>
+
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+          <span
+            style="
+              font-size: 12px;
+              color: #9ca3af;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+            "
+          >
+            To
+          </span>
+          <input
+            type="text"
+            placeholder="City or airport"
+            [(ngModel)]="searchRequest.toPlace"
+            name="toPlace"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Dates row -->
+      <div class="row">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+          <span
+            style="
+              font-size: 12px;
+              color: #9ca3af;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+            "
+          >
+            Departure
+          </span>
+          <input type="date" [(ngModel)]="searchRequest.travelDate" name="travelDate" required />
+        </div>
+
+        <div
+          style="flex: 1; display: flex; flex-direction: column; gap: 4px"
+          *ngIf="searchRequest.tripType === 'ROUND_TRIP'"
+        >
+          <span
+            style="
+              font-size: 12px;
+              color: #9ca3af;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+            "
+          >
+            Return
+          </span>
+          <input type="date" [(ngModel)]="searchRequest.returnDate" name="returnDate" />
+        </div>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit">Search flights</button>
+    </form>
+  </div>
+  <!-- Loading / empty states -->
+  <div *ngIf="loading()" class="loading">Searching flights…</div>
+
+  <div *ngIf="!loading() && flights().length === 0" class="no-results">
+    No flights found. Try different dates or airports.
+  </div>
+
+  <!-- Use flights() and loading() with parentheses -->
+  <div class="results" *ngIf="!loading() && flights().length > 0">
+    <div class="flight-card" *ngFor="let flight of flights()">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <h3>{{ flight.airlineName }} ({{ flight.flightNumber }})</h3>
+        <span style="font-size: 13px; font-weight: 600; color: #facc15">
+          ₹{{ flight.oneWayPrice || flight.roundTripPrice }}
+        </span>
+      </div>
+
+      <p>
+        <strong>Departure:</strong>
+        {{ flight.departureTime | date : 'MMM d, y, h:mm a' }}<br />
+        <strong>Arrival:</strong>
+        {{ flight.arrivalTime | date : 'MMM d, y, h:mm a' }}
+      </p>
+
+      <p *ngIf="flight.message" class="info">
+        {{ flight.message }}
+      </p>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 10px">
+        <button class="book-btn" (click)="bookFlight(flight)">Book Ticket</button>
+      </div>
     </div>
-
-    <div class="row">
-      <input type="date" [(ngModel)]="searchRequest.travelDate" name="travelDate" required />
-
-      <select [(ngModel)]="searchRequest.tripType" name="tripType">
-        <option value="ONE_WAY">One Way</option>
-        <option value="ROUND_TRIP">Round Trip</option>
-      </select>
-    </div>
-
-    <div class="row" *ngIf="searchRequest.tripType === 'ROUND_TRIP'">
-      <input type="date" [(ngModel)]="searchRequest.returnDate" name="returnDate" />
-    </div>
-
-    <button type="submit">Search Flights</button>
-  </form>
-</div>
-
-<div *ngIf="loading">Searching flights...</div>
-
-<div *ngIf="!loading && flights.length === 0">No flights found</div>
-
-<div class="results" *ngIf="!loading && flights.length > 0">
-  <div class="flight-card" *ngFor="let flight of flights">
-    <h3>{{ flight.airlineName }} ({{ flight.flightNumber }})</h3>
-
-    <p>
-      Departure: {{ flight.departureTime }} <br />
-      Arrival: {{ flight.arrivalTime }}
-    </p>
-
-    <p>One Way Price: ₹{{ flight.oneWayPrice }}</p>
-
-    <p *ngIf="flight.message" class="info">
-      {{ flight.message }}
-    </p>
   </div>
 </div>

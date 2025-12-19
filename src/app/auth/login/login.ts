@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   selector: 'app-login',
   templateUrl: './login.html',
+  styleUrl: './login.css',
   imports: [FormsModule, RouterModule, CommonModule],
 })
 export class LoginComponent {
