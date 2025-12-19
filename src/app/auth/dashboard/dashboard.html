@@ -1,140 +1,213 @@
 <div class="main-container">
-  <h2 class="title">Search Flights</h2>
+  <div *ngIf="!selectedFlight()">
+    <h2 class="title">Search Flights</h2>
 
-  <div class="search-card">
-    <form (ngSubmit)="onSearch()">
-      <!-- Trip type row -->
-      <div class="row">
-        <label
-          style="
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #e5e7eb;
-            font-size: 13px;
-          "
-        >
-          <span>Trip</span>
-          <select [(ngModel)]="searchRequest.tripType" name="tripType">
-            <option value="ONE_WAY">One way</option>
-            <option value="ROUND_TRIP">Round trip</option>
-          </select>
-        </label>
+    <div class="search-card">
+      <form (ngSubmit)="onSearch()">
+        <div class="row">
+          <label
+            style="
+              flex: 1;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              color: #e5e7eb;
+              font-size: 13px;
+            "
+          >
+            <span>Trip</span>
+            <select [(ngModel)]="searchRequest.tripType" name="tripType">
+              <option value="ONE_WAY">One way</option>
+              <option value="ROUND_TRIP">Round trip</option>
+            </select>
+          </label>
+        </div>
+
+        <!-- From / To row -->
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span
+              style="
+                font-size: 12px;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+              "
+            >
+              From
+            </span>
+            <input
+              type="text"
+              placeholder="City or airport"
+              [(ngModel)]="searchRequest.fromPlace"
+              name="fromPlace"
+              required
+            />
+          </div>
+
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span
+              style="
+                font-size: 12px;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+              "
+            >
+              To
+            </span>
+            <input
+              type="text"
+              placeholder="City or airport"
+              [(ngModel)]="searchRequest.toPlace"
+              name="toPlace"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Dates row -->
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span
+              style="
+                font-size: 12px;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+              "
+            >
+              Departure
+            </span>
+            <input type="date" [(ngModel)]="searchRequest.travelDate" name="travelDate" required />
+          </div>
+
+          <div
+            style="flex: 1; display: flex; flex-direction: column; gap: 4px"
+            *ngIf="searchRequest.tripType === 'ROUND_TRIP'"
+          >
+            <span
+              style="
+                font-size: 12px;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+              "
+            >
+              Return
+            </span>
+            <input type="date" [(ngModel)]="searchRequest.returnDate" name="returnDate" />
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit">Search flights</button>
+      </form>
+    </div>
+    <!-- Loading / empty states -->
+    <div *ngIf="loading()" class="loading">Searching flights…</div>
+
+    <div *ngIf="!loading() && flights().length === 0" class="no-results">
+      No flights found. Try different dates or airports.
+    </div>
+
+    <!-- Use flights() and loading() with parentheses -->
+    <div class="results" *ngIf="!loading() && flights().length > 0">
+      <div class="flight-card" *ngFor="let flight of flights()">
+        <div style="display: flex; justify-content: space-between; align-items: baseline">
+          <h3>{{ flight.airlineName }} ({{ flight.flightNumber }})</h3>
+          <span style="font-size: 13px; font-weight: 600; color: #facc15">
+            ₹{{ flight.oneWayPrice || flight.roundTripPrice }}
+          </span>
+        </div>
+
+        <p>
+          <strong>Departure:</strong>
+          {{ flight.departureTime | date : 'MMM d, y, h:mm a' }}<br />
+          <strong>Arrival:</strong>
+          {{ flight.arrivalTime | date : 'MMM d, y, h:mm a' }}
+        </p>
+
+        <p *ngIf="flight.message" class="info">
+          {{ flight.message }}
+        </p>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 10px">
+          <button class="book-btn" (click)="bookFlight(flight)">Book Ticket</button>
+        </div>
       </div>
-
-      <!-- From / To row -->
-      <div class="row">
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
-          <span
-            style="
-              font-size: 12px;
-              color: #9ca3af;
-              text-transform: uppercase;
-              letter-spacing: 0.06em;
-            "
-          >
-            From
-          </span>
-          <input
-            type="text"
-            placeholder="City or airport"
-            [(ngModel)]="searchRequest.fromPlace"
-            name="fromPlace"
-            required
-          />
-        </div>
-
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
-          <span
-            style="
-              font-size: 12px;
-              color: #9ca3af;
-              text-transform: uppercase;
-              letter-spacing: 0.06em;
-            "
-          >
-            To
-          </span>
-          <input
-            type="text"
-            placeholder="City or airport"
-            [(ngModel)]="searchRequest.toPlace"
-            name="toPlace"
-            required
-          />
-        </div>
-      </div>
-
-      <!-- Dates row -->
-      <div class="row">
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
-          <span
-            style="
-              font-size: 12px;
-              color: #9ca3af;
-              text-transform: uppercase;
-              letter-spacing: 0.06em;
-            "
-          >
-            Departure
-          </span>
-          <input type="date" [(ngModel)]="searchRequest.travelDate" name="travelDate" required />
-        </div>
-
-        <div
-          style="flex: 1; display: flex; flex-direction: column; gap: 4px"
-          *ngIf="searchRequest.tripType === 'ROUND_TRIP'"
-        >
-          <span
-            style="
-              font-size: 12px;
-              color: #9ca3af;
-              text-transform: uppercase;
-              letter-spacing: 0.06em;
-            "
-          >
-            Return
-          </span>
-          <input type="date" [(ngModel)]="searchRequest.returnDate" name="returnDate" />
-        </div>
-      </div>
-
-      <!-- Submit button -->
-      <button type="submit">Search flights</button>
-    </form>
+    </div>
   </div>
-  <!-- Loading / empty states -->
-  <div *ngIf="loading()" class="loading">Searching flights…</div>
 
-  <div *ngIf="!loading() && flights().length === 0" class="no-results">
-    No flights found. Try different dates or airports.
-  </div>
+  <div *ngIf="selectedFlight() as flight" class="booking-container">
+    <h2 class="title">Passenger Details</h2>
+    <p style="color: white; margin-bottom: 20px">
+      Booking for: <b>{{ flight.airlineName }} ({{ flight.flightNumber }})</b>
+    </p>
 
-  <!-- Use flights() and loading() with parentheses -->
-  <div class="results" *ngIf="!loading() && flights().length > 0">
-    <div class="flight-card" *ngFor="let flight of flights()">
-      <div style="display: flex; justify-content: space-between; align-items: baseline">
-        <h3>{{ flight.airlineName }} ({{ flight.flightNumber }})</h3>
-        <span style="font-size: 13px; font-weight: 600; color: #facc15">
-          ₹{{ flight.oneWayPrice || flight.roundTripPrice }}
-        </span>
-      </div>
+    <div class="search-card">
+      <form (ngSubmit)="confirmBooking()">
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Contact Email</span>
+            <input
+              type="email"
+              [(ngModel)]="bookingRequest.email"
+              name="email"
+              required
+              placeholder="your@email.com"
+            />
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Number of Seats</span>
+            <input
+              type="number"
+              [(ngModel)]="bookingRequest.numberOfSeats"
+              name="numSeats"
+              (change)="generatePassengerFields()"
+              min="1"
+              max="10"
+            />
+          </div>
+        </div>
 
-      <p>
-        <strong>Departure:</strong>
-        {{ flight.departureTime | date : 'MMM d, y, h:mm a' }}<br />
-        <strong>Arrival:</strong>
-        {{ flight.arrivalTime | date : 'MMM d, y, h:mm a' }}
-      </p>
+        <hr style="border: 0.5px solid #334155; margin: 20px 0" />
+        <div *ngFor="let p of bookingRequest.passengers; let i = index" class="passenger-box">
+          <h4 style="color: #38bdf8; margin-bottom: 10px">Passenger {{ i + 1 }}</h4>
 
-      <p *ngIf="flight.message" class="info">
-        {{ flight.message }}
-      </p>
+          <div class="row">
+            <input
+              type="text"
+              [(ngModel)]="p.name"
+              name="name{{ i }}"
+              placeholder="Full Name"
+              required
+            />
+            <input type="number" [(ngModel)]="p.age" name="age{{ i }}" placeholder="Age" required />
+          </div>
 
-      <div style="display: flex; justify-content: flex-end; margin-top: 10px">
-        <button class="book-btn" (click)="bookFlight(flight)">Book Ticket</button>
-      </div>
+          <div class="row">
+            <select [(ngModel)]="p.gender" name="gender{{ i }}">
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+            <select [(ngModel)]="p.meal" name="meal{{ i }}">
+              <option value="VEG">Veg</option>
+              <option value="NON_VEG">Non-Veg</option>
+            </select>
+            <select [(ngModel)]="p.fareCategory" name="fare{{ i }}">
+              <option value="GENERAL">General</option>
+              <option value="STUDENT">STUDENT</option>
+              <option value="ARMY">ARMY</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button type="submit" class="confirm-btn">Confirm Booking</button>
+          <button type="button" (click)="cancelBooking()" class="cancel-btn">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

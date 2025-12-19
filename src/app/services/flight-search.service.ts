@@ -14,4 +14,9 @@ export class FlightSearchService {
   searchFlights(payload: FlightSearchRequest): Observable<FlightSearchResponse[]> {
     return this.http.post<FlightSearchResponse[]>(`${this.baseUrl}/search`, payload);
   }
+
+  bookFlight(flightId: string, bookingData: any) {
+    const url = `http://localhost:9996/booking-service-micro-assignment/api/flight/booking/${flightId}`;
+    return this.http.post(url, bookingData);
+  }
 }

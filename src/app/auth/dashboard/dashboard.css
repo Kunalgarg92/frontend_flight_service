@@ -17,6 +17,61 @@ body {
   align-items: center;
   width: 100%;
 }
+
+.booking-container {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+}
+
+.label-text {
+  font-size: 12px;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+.passenger-box {
+  background: rgba(30, 41, 59, 0.5);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px dashed #475569;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.confirm-btn {
+  background: #22c55e !important;
+  color: white !important;
+  flex: 2;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-weight: bold;
+}
+
+.cancel-btn {
+  background: #ef4444 !important;
+  color: white !important;
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+}
+
+.confirm-btn:hover {
+  opacity: 0.9;
+}
+.cancel-btn:hover {
+  opacity: 0.9;
+}
 /* Title */
 .title {
   margin-bottom: 16px;

@@ -8,6 +8,7 @@ export interface FlightSearchRequest {
 }
 
 export interface FlightSearchResponse {
+  flightId: string;
   airlineName: string;
   flightNumber: string;
   departureTime: string;
@@ -18,4 +19,19 @@ export interface FlightSearchResponse {
   returnDepartureTime?: string | null;
   returnArrivalTime?: string | null;
   returnFlightNumber?: string | null;
+}
+
+export interface Passenger {
+  name: string;
+  gender: string;
+  age: number;
+  meal: string;
+  fareCategory: string;
+  seatNumber: number;
+}
+
+export interface BookingRequest {
+  email: string;
+  numberOfSeats: number;
+  passengers: Passenger[];
 }
