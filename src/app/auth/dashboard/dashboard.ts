@@ -118,7 +118,7 @@ export class DashboardComponent {
           next: () => {
             alert('Booking cancelled successfully');
             this.loadBookings();
-            this.pnrTicket = null; 
+            this.pnrTicket = null;
           },
           error: (err) => alert('Failed to cancel: ' + err.message),
         });
@@ -216,42 +216,42 @@ export class DashboardComponent {
   pnrTicket: any;
 
   // Add this variable at the top of your class with other variables
-pnrErrorMessage: string = '';
+  pnrErrorMessage: string = '';
 
-getTicketByPnr() {
-  // Reset state before searching
-  this.pnrTicket = null;
-  this.pnrErrorMessage = '';
+  getTicketByPnr() {
+    // Reset state before searching
+    this.pnrTicket = null;
+    this.pnrErrorMessage = '';
 
-  if (!this.pnr) {
-    this.pnrErrorMessage = 'Please enter a PNR number.';
-    return;
-  }
+    if (!this.pnr) {
+      this.pnrErrorMessage = 'Please enter a PNR number.';
+      return;
+    }
 
-  const token = localStorage.getItem('token');
-  const headers = new HttpHeaders({
-    'Authorization': `Bearer ${token}`
-  });
-
-  this.http
-    .get<any>(`/booking-service-micro-assignment/api/flight/ticket/${this.pnr}`, { headers })
-    .subscribe({
-      next: (res) => {
-        if (res) {
-          this.pnrTicket = res;
-          this.pnrErrorMessage = '';
-        } else {
-          this.pnrErrorMessage = 'No ticket available for this PNR.';
-        }
-      },
-      error: (err) => {
-        console.error("Ticket error", err);
-        // Even if the server gives 500 or 404, we show "No ticket available"
-        this.pnrTicket = null;
-        this.pnrErrorMessage = 'No ticket available for this PNR or the PNR is invalid.';
-      }
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
     });
-}
+
+    this.http
+      .get<any>(`/booking-service-micro-assignment/api/flight/ticket/${this.pnr}`, { headers })
+      .subscribe({
+        next: (res) => {
+          if (res) {
+            this.pnrTicket = res;
+            this.pnrErrorMessage = '';
+          } else {
+            this.pnrErrorMessage = 'No ticket available for this PNR.';
+          }
+        },
+        error: (err) => {
+          console.error('Ticket error', err);
+          // Even if the server gives 500 or 404, we show "No ticket available"
+          this.pnrTicket = null;
+          this.pnrErrorMessage = 'No ticket available for this PNR or the PNR is invalid.';
+        },
+      });
+  }
 
   // -------- BOOK FLIGHT --------
   bookingRequest: BookingRequest = {
@@ -277,6 +277,8 @@ getTicketByPnr() {
   bookFlight(flight: FlightSearchResponse) {
     this.selectedFlight.set(flight);
     this.bookingRequest.numberOfSeats = 1;
+    this.bookingRequest.email = this.getEmailFromToken();
+
     this.generatePassengerFields();
   }
 
@@ -288,9 +290,13 @@ getTicketByPnr() {
       next: () => {
         alert('Booking Successful!');
         this.selectedFlight.set(null);
+        this.loadBookings();
+        this.view = 'BOOKINGS';
       },
       error: (err) => alert(err.error?.message || 'Booking failed'),
     });
+    console.log('Sending Booking Request:', this.bookingRequest);
+    console.log('For Flight ID:', flight.flightId);
   }
 
   cancelBooking() {
