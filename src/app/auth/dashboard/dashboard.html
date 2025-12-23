@@ -218,15 +218,15 @@
       </form>
     </div>
   </div>
-  <!-- MY BOOKINGS SECTION -->
   <div *ngIf="view === 'BOOKINGS'" class="booking-history">
     <h2 class="page-title">My Booking History</h2>
 
-    <div *ngIf="bookings.length === 0" class="no-results">No bookings found.</div>
+    <div *ngIf="!bookings || bookings.length === 0" class="no-results">
+      No active bookings found.
+    </div>
 
-    <div class="ticket-container">
+    <div class="ticket-container" *ngIf="bookings && bookings.length > 0">
       <div class="pro-ticket" *ngFor="let b of bookings">
-        <!-- Left Side: Flight Info -->
         <div class="ticket-main">
           <div class="ticket-header">
             <span class="airline-name">{{ b.airlineName }}</span>
@@ -268,8 +268,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Right Side: Actions -->
         <div class="ticket-actions">
           <button class="cancel-ticket-btn" (click)="cancelBookingById(b.pnr)">
             Cancel Booking
@@ -279,7 +277,6 @@
     </div>
   </div>
 
-  <!-- PNR SEARCH SECTION -->
   <div *ngIf="view === 'PNR'" class="pnr-box">
     <h2 class="page-title">Digital Ticket Retrieval</h2>
 
@@ -288,7 +285,6 @@
       <button (click)="getTicketByPnr()">Search Ticket</button>
     </div>
 
-    <!-- SHOW THIS IF TICKET IS NOT FOUND -->
     <div
       *ngIf="pnrErrorMessage"
       class="no-results"
@@ -303,24 +299,19 @@
       {{ pnrErrorMessage }}
     </div>
 
-    <!-- SHOW TICKET IF FOUND -->
     <div *ngIf="pnrTicket" class="ticket-container" style="margin-top: 30px">
       <div class="pro-ticket">
-        <!-- ... keep your existing ticket-main and ticket-actions code here ... -->
         <div class="ticket-main">
           <div class="ticket-header">
             <span class="airline-name">{{ pnrTicket.airlineName }}</span>
             <span class="pnr-badge">PNR: {{ pnrTicket.pnr }}</span>
           </div>
-          <!-- details... -->
         </div>
       </div>
     </div>
   </div>
-  <!-- ADD FLIGHT FORM -->
   <div *ngIf="view === 'ADD_FLIGHT'" class="booking-container">
     <h2 class="page-title">Add New Flight Inventory</h2>
-
     <div class="search-card">
       <form (ngSubmit)="onAddFlight()">
         <div class="row">
@@ -366,7 +357,6 @@
           </div>
         </div>
 
-        <!-- ADDED SPECIAL FARE AND CATEGORY HERE -->
         <div class="row">
           <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
             <span class="label-text">Regular Price</span>

@@ -34,7 +34,6 @@ export class DashboardComponent {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        // Check if ROLE_ADMIN exists in the roles array of the JWT
         if (payload.roles && payload.roles.includes('ROLE_ADMIN')) {
           this.isAdmin.set(true);
         }
@@ -113,14 +112,27 @@ export class DashboardComponent {
       });
 
       this.http
-        .delete(`/booking-service-micro-assignment/api/flight/booking/cancel/${pnr}`, { headers })
+        .delete(`/booking-service-micro-assignment/api/flight/booking/cancel/${pnr}`, {
+          headers,
+          responseType: 'text',
+        })
         .subscribe({
-          next: () => {
+          next: (response) => {
             alert('Booking cancelled successfully');
-            this.loadBookings();
+            this.bookings = this.bookings.filter((b) => b.pnr !== pnr);
             this.pnrTicket = null;
+            this.loadBookings();
           },
-          error: (err) => alert('Failed to cancel: ' + err.message),
+          error: (err) => {
+            if (err.status === 200 || err.status === 204 || err.status === 0) {
+              alert('Booking cancelled successfully');
+              this.bookings = this.bookings.filter((b) => b.pnr !== pnr);
+              this.loadBookings();
+            } else {
+              console.error('Cancellation Error:', err);
+              alert('Failed to cancel: ' + (err.error?.message || err.message));
+            }
+          },
         });
     }
   }
@@ -215,11 +227,9 @@ export class DashboardComponent {
   pnr = '';
   pnrTicket: any;
 
-  // Add this variable at the top of your class with other variables
   pnrErrorMessage: string = '';
 
   getTicketByPnr() {
-    // Reset state before searching
     this.pnrTicket = null;
     this.pnrErrorMessage = '';
 
@@ -246,14 +256,11 @@ export class DashboardComponent {
         },
         error: (err) => {
           console.error('Ticket error', err);
-          // Even if the server gives 500 or 404, we show "No ticket available"
           this.pnrTicket = null;
           this.pnrErrorMessage = 'No ticket available for this PNR or the PNR is invalid.';
         },
       });
   }
-
-  // -------- BOOK FLIGHT --------
   bookingRequest: BookingRequest = {
     email: '',
     numberOfSeats: 1,
