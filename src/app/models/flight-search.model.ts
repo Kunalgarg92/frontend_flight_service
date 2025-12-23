@@ -35,3 +35,16 @@ export interface BookingRequest {
   numberOfSeats: number;
   passengers: Passenger[];
 }
+
+export interface FlightInventory {
+  airlineName: string;
+  flightNumber: string;
+  fromPlace: string;
+  toPlace: string;
+  departureTime: string;
+  arrivalTime: string;
+  totalSeats: number;
+  price: number;
+  specialFare: number;
+  fareCategory: string;
+}

@@ -1,6 +1,19 @@
 <div class="main-container">
+  <div class="top-bar">
+    <h1 class="app-title">Flight Dashboard</h1>
+
+    <div class="top-actions">
+      <button (click)="showSearch()">Search Flights</button>
+      <button (click)="showBookings()">My Bookings</button>
+      <button (click)="showPnrSearch()">Get Ticket by PNR</button>
+      <button *ngIf="isAdmin()" (click)="showAddFlight()" style="background-color: #ef4444">
+        Add Flight
+      </button>
+    </div>
+  </div>
+
   <div *ngIf="!selectedFlight()">
-    <h2 class="title">Search Flights</h2>
+    <h2 class="page-title">Search Flights</h2>
 
     <div class="search-card">
       <form (ngSubmit)="onSearch()">
@@ -23,7 +36,6 @@
           </label>
         </div>
 
-        <!-- From / To row -->
         <div class="row">
           <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
             <span
@@ -66,7 +78,6 @@
           </div>
         </div>
 
-        <!-- Dates row -->
         <div class="row">
           <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
             <span
@@ -99,19 +110,15 @@
             <input type="date" [(ngModel)]="searchRequest.returnDate" name="returnDate" />
           </div>
         </div>
-
-        <!-- Submit button -->
         <button type="submit">Search flights</button>
       </form>
     </div>
-    <!-- Loading / empty states -->
     <div *ngIf="loading()" class="loading">Searching flights…</div>
 
     <div *ngIf="!loading() && flights().length === 0" class="no-results">
       No flights found. Try different dates or airports.
     </div>
 
-    <!-- Use flights() and loading() with parentheses -->
     <div class="results" *ngIf="!loading() && flights().length > 0">
       <div class="flight-card" *ngFor="let flight of flights()">
         <div style="display: flex; justify-content: space-between; align-items: baseline">
@@ -206,6 +213,188 @@
         <div class="button-group">
           <button type="submit" class="confirm-btn">Confirm Booking</button>
           <button type="button" (click)="cancelBooking()" class="cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- MY BOOKINGS SECTION -->
+  <div *ngIf="view === 'BOOKINGS'" class="booking-history">
+    <h2 class="page-title">My Booking History</h2>
+
+    <div *ngIf="bookings.length === 0" class="no-results">No bookings found.</div>
+
+    <div class="ticket-container">
+      <div class="pro-ticket" *ngFor="let b of bookings">
+        <!-- Left Side: Flight Info -->
+        <div class="ticket-main">
+          <div class="ticket-header">
+            <span class="airline-name">{{ b.airlineName }}</span>
+            <span class="flight-no">{{ b.flightNumber }}</span>
+            <span class="pnr-badge">PNR: {{ b.pnr }}</span>
+          </div>
+
+          <div class="ticket-body">
+            <div class="route">
+              <div class="station">
+                <span class="city">{{ b.fromPlace }}</span>
+                <span class="label">From</span>
+              </div>
+              <div class="plane-icon">✈</div>
+              <div class="station">
+                <span class="city">{{ b.toPlace }}</span>
+                <span class="label">To</span>
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">Date</span>
+                <span class="val">{{ b.travelDate | date : 'mediumDate' }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Status</span>
+                <span class="val status-confirmed">Confirmed</span>
+              </div>
+            </div>
+
+            <div class="passenger-section">
+              <span class="label">Passengers</span>
+              <div class="pass-list">
+                <span *ngFor="let p of b.passengers" class="pass-tag">
+                  {{ p.name }} ({{ p.age }}y)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Actions -->
+        <div class="ticket-actions">
+          <button class="cancel-ticket-btn" (click)="cancelBookingById(b.pnr)">
+            Cancel Booking
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PNR SEARCH SECTION -->
+  <div *ngIf="view === 'PNR'" class="pnr-box">
+    <h2 class="page-title">Digital Ticket Retrieval</h2>
+
+    <div class="pnr-search-bar">
+      <input type="text" [(ngModel)]="pnr" placeholder="Enter PNR Number (e.g. OJ5KKW)" />
+      <button (click)="getTicketByPnr()">Search Ticket</button>
+    </div>
+
+    <!-- SHOW THIS IF TICKET IS NOT FOUND -->
+    <div
+      *ngIf="pnrErrorMessage"
+      class="no-results"
+      style="
+        margin-top: 20px;
+        color: #f87171;
+        border: 1px dashed #f87171;
+        padding: 20px;
+        border-radius: 8px;
+      "
+    >
+      {{ pnrErrorMessage }}
+    </div>
+
+    <!-- SHOW TICKET IF FOUND -->
+    <div *ngIf="pnrTicket" class="ticket-container" style="margin-top: 30px">
+      <div class="pro-ticket">
+        <!-- ... keep your existing ticket-main and ticket-actions code here ... -->
+        <div class="ticket-main">
+          <div class="ticket-header">
+            <span class="airline-name">{{ pnrTicket.airlineName }}</span>
+            <span class="pnr-badge">PNR: {{ pnrTicket.pnr }}</span>
+          </div>
+          <!-- details... -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ADD FLIGHT FORM -->
+  <div *ngIf="view === 'ADD_FLIGHT'" class="booking-container">
+    <h2 class="page-title">Add New Flight Inventory</h2>
+
+    <div class="search-card">
+      <form (ngSubmit)="onAddFlight()">
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Airline Name</span>
+            <input type="text" [(ngModel)]="newFlight.airlineName" name="airlineName" required />
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Flight Number</span>
+            <input type="text" [(ngModel)]="newFlight.flightNumber" name="flightNumber" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">From</span>
+            <input type="text" [(ngModel)]="newFlight.fromPlace" name="fromPlace" required />
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">To</span>
+            <input type="text" [(ngModel)]="newFlight.toPlace" name="toPlace" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Departure Time</span>
+            <input
+              type="datetime-local"
+              [(ngModel)]="newFlight.departureTime"
+              name="deptTime"
+              required
+            />
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Arrival Time</span>
+            <input
+              type="datetime-local"
+              [(ngModel)]="newFlight.arrivalTime"
+              name="arrTime"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- ADDED SPECIAL FARE AND CATEGORY HERE -->
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Regular Price</span>
+            <input type="number" [(ngModel)]="newFlight.price" name="price" required />
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Special Fare</span>
+            <input type="number" [(ngModel)]="newFlight.specialFare" name="specFare" required />
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Fare Category</span>
+            <select [(ngModel)]="newFlight.fareCategory" name="fareCat">
+              <option value="STUDENT">STUDENT</option>
+              <option value="GENERAL">GENERAL</option>
+              <option value="ARMY">ARMY</option>
+            </select>
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="label-text">Total Seats</span>
+            <input type="number" [(ngModel)]="newFlight.totalSeats" name="seats" required />
+          </div>
+        </div>
+
+        <div class="button-group" style="margin-top: 20px">
+          <button type="submit" class="confirm-btn">SAVE FLIGHT</button>
+          <button type="button" (click)="showSearch()" class="cancel-btn">Cancel</button>
         </div>
       </form>
     </div>

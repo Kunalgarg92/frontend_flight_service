@@ -28,8 +28,9 @@ export class LoginComponent {
     };
 
     this.auth.login(payload).subscribe({
-      next: () => {
-        this.loginError = false;
+      next: (res) => {
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('userEmail', res.email); // Add this line!
         this.router.navigate(['/dashboard']);
       },
       error: () => {

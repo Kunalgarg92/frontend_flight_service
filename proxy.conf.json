@@ -1,0 +1,17 @@
+{
+  "/booking-service-micro-assignment": {
+    "target": "http://localhost:9996",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/flight-service-micro-assignment": {
+    "target": "http://localhost:9996",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/auth": {
+    "target": "http://localhost:9996",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
